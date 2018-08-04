@@ -23,7 +23,7 @@ from charms.reactive.relations import endpoint_from_flag
 from charms.reactive.helpers import data_changed
 
 from charmhelpers.core.hookenv import status_set, log, config
-from charmhelpers.core import templating, unitdata
+from charmhelpers.core import templating, unitdata, hookenv
 
 from charms.layer import lets_encrypt
 
@@ -149,6 +149,15 @@ def remove_http_setup():
     clean_nginx('/etc/nginx/sites-available/http')
     update_nginx()
     clear_flag('ssl-termination-http.setup')
+
+
+########################################################################
+# Public ip address
+########################################################################
+@when('endpoint.ssl-termination.available')
+def provide_public_ip_address():
+    ssl_termination = endpoint_from_flag('endpoint.ssl-termination.available')
+    ssl_termination.set_public_ip_address(hookenv.unit_get('public-address'))
 
 
 ########################################################################
